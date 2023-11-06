@@ -73,6 +73,7 @@ pub fn es_compat_cluster_info_handler(
                 }))
             },
         )
+        .with(warp::reply::with::header("X-Elastic-Product", "Elasticsearch"))
 }
 
 /// GET or POST _elastic/_search
@@ -89,6 +90,7 @@ pub fn es_compat_search_handler(
         };
         make_json_api_response::<(), _>(Err(api_error), BodyFormat::default())
     })
+        .with(warp::reply::with::header("X-Elastic-Product", "Elasticsearch"))
 }
 
 /// GET or POST _elastic/{index}/_search
@@ -99,6 +101,7 @@ pub fn es_compat_index_search_handler(
         .and(with_arg(search_service))
         .then(es_compat_index_search)
         .map(make_elastic_api_response)
+        .with(warp::reply::with::header("X-Elastic-Product", "Elasticsearch"))
 }
 
 /// GET or POST _elastic/_search/scroll
@@ -109,6 +112,7 @@ pub fn es_compat_scroll_handler(
         .and(with_arg(search_service))
         .then(es_scroll)
         .map(make_elastic_api_response)
+        .with(warp::reply::with::header("X-Elastic-Product", "Elasticsearch"))
 }
 
 /// POST _elastic/_search
@@ -125,6 +129,7 @@ pub fn es_compat_index_multi_search_handler(
             };
             JsonApiResponse::new(&result, status_code, &BodyFormat::default())
         })
+        .with(warp::reply::with::header("X-Elastic-Product", "Elasticsearch"))
 }
 
 fn build_request_for_es_api(

@@ -1,6 +1,6 @@
 [package]
 name = "quickwit-cli"
-version = "0.6.3"
+version = "0.6.5-dev"
 authors = ["Quickwit, Inc. <hello@quickwit.io>"]
 edition = "2021"
 license = "AGPL-3.0-or-later"                               # For a commercial, license, contact hello@quickwit.io
@@ -21,7 +21,7 @@ path = "src/generate_markdown.rs"
 [dependencies]
 anyhow = { workspace = true }
 async-trait = { workspace = true }
-byte-unit = { workspace = true }
+bytesize = { workspace = true }
 bytes = { workspace = true }
 chitchat = { workspace = true }
 clap = { workspace = true }

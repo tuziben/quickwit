@@ -1,6 +1,6 @@
 [package]
 name = "quickwit-storage"
-version = "0.6.3"
+version = "0.6.5-dev"
 authors = ["Quickwit, Inc. <hello@quickwit.io>"]
 edition = "2021"
 license = "AGPL-3.0-or-later"                           # For a commercial, license, contact hello@quickwit.io
@@ -13,8 +13,8 @@ documentation = "https://quickwit.io/docs/"
 anyhow = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
-byte-unit = { workspace = true }
 bytes = { workspace = true }
+bytesize = { workspace = true }
 fnv = { workspace = true }
 futures = { workspace = true }
 hyper = { workspace = true }

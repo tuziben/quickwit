@@ -106,6 +106,7 @@ pub struct ClientArgs {
     pub connect_timeout: Option<Timeout>,
     pub timeout: Option<Timeout>,
     pub commit_timeout: Option<Timeout>,
+    pub ingest_v2: bool,
 }
 
 impl Default for ClientArgs {
@@ -115,6 +116,7 @@ impl Default for ClientArgs {
             connect_timeout: None,
             timeout: None,
             commit_timeout: None,
+            ingest_v2: false,
         }
     }
 }
@@ -127,31 +129,14 @@ impl ClientArgs {
         }
         if let Some(timeout) = self.timeout {
             builder = builder.timeout(timeout);
-        }
-        builder.build()
-    }
-
-    pub fn search_client(self) -> QuickwitClient {
-        let mut builder = QuickwitClientBuilder::new(self.cluster_endpoint);
-        if let Some(connect_timeout) = self.connect_timeout {
-            builder = builder.connect_timeout(connect_timeout);
-        }
-        if let Some(timeout) = self.timeout {
             builder = builder.search_timeout(timeout);
-        }
-        builder.build()
-    }
-
-    pub fn ingest_client(self) -> QuickwitClient {
-        let mut builder = QuickwitClientBuilder::new(self.cluster_endpoint);
-        if let Some(connect_timeout) = self.connect_timeout {
-            builder = builder.connect_timeout(connect_timeout);
-        }
-        if let Some(timeout) = self.timeout {
             builder = builder.ingest_timeout(timeout);
         }
         if let Some(commit_timeout) = self.commit_timeout {
             builder = builder.commit_timeout(commit_timeout);
+        }
+        if self.ingest_v2 {
+            builder = builder.enable_ingest_v2();
         }
         builder.build()
     }
@@ -180,6 +165,11 @@ impl ClientArgs {
         } else {
             None
         };
+        let ingest_v2 = if process_ingest {
+            matches.get_flag("v2")
+        } else {
+            false
+        };
         let commit_timeout = if process_ingest {
             if let Some(duration) = matches.remove_one::<String>("commit-timeout") {
                 Some(parse_duration_or_none(&duration)?)
@@ -194,6 +184,7 @@ impl ClientArgs {
             connect_timeout,
             timeout,
             commit_timeout,
+            ingest_v2,
         })
     }
 }

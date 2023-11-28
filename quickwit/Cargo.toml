@@ -97,6 +97,8 @@ itertools = "0.12"
 json_comments = "0.2"
 libz-sys = "1.1.8"
 lru = "0.12"
+urlencoding = "2.0.0"
+
 lindera-core = "0.27.0"
 lindera-dictionary = "0.27.0"
 lindera-tokenizer = { version = "0.27.0", features = [

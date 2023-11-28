@@ -28,6 +28,7 @@ use elasticsearch_dsl::{ErrorCause, HitsMetadata, Source, TotalHits, TotalHitsRe
 use futures_util::StreamExt;
 use hyper::StatusCode;
 use itertools::Itertools;
+use urlencoding::decode;
 use quickwit_common::truncate_str;
 use quickwit_config::{validate_index_id_pattern, NodeConfig};
 use quickwit_proto::search::{CountHits, PartialHit, ScrollRequest, SearchResponse, SortByValue};
@@ -355,7 +356,20 @@ async fn es_compat_index_multi_search(
                 "`_msearch` request header must define at least one index".to_string(),
             )));
         }
-        for index in &request_header.index {
+
+        let mut indexes = Vec::new();
+        for encoded_str in &request_header.index {
+            match decode(encoded_str) {
+                Ok(decoded_str) => {
+                    indexes.push(decoded_str.to_string());
+                }
+                Err(err) => {
+                    eprintln!("Error decoding string: {}", err);
+                }
+            }
+        }
+
+        for index in &indexes {
             validate_index_id_pattern(index).map_err(|err| {
                 SearchError::InvalidArgument(format!(
                     "request header contains an invalid index: {}",
@@ -363,7 +377,6 @@ async fn es_compat_index_multi_search(
                 ))
             })?;
         }
-        let index_ids_patterns = request_header.index.clone();
         let search_body = payload_lines
             .next()
             .ok_or_else(|| {
@@ -380,7 +393,7 @@ async fn es_compat_index_multi_search(
             })?;
         let search_query_params = SearchQueryParams::from(request_header);
         let es_request =
-            build_request_for_es_api(index_ids_patterns, search_query_params, search_body)?;
+            build_request_for_es_api(indexes, search_query_params, search_body)?;
         search_requests.push(es_request);
     }
     // TODO: forced to do weird referencing to work around https://github.com/rust-lang/rust/issues/100905
